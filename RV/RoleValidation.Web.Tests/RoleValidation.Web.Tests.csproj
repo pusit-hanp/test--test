@@ -1,0 +1,117 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <OutputType>Exe</OutputType>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <IsPackable>false</IsPackable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="coverlet.MTP" Version="10.0.1" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="18.9.0" />
+    <PackageReference Include="Moq" Version="4.20.72" />
+    <PackageReference Include="xunit.v3" Version="4.0.0" />
+    <PackageReference Include="xunit.runner.visualstudio" Version="4.0.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\RoleValidation.Web\RoleValidation.Web.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Using Include="Xunit" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="..\RoleValidation.Web\Views\ApplicationUsers\Index.cshtml"
+             Link="Views\ApplicationUsers\Index.cshtml"
+             CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="..\RoleValidation.Web\Views\AuthorizedUsers\Index.cshtml"
+             Link="Views\AuthorizedUsers\Index.cshtml"
+             CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="..\RoleValidation.Web\Views\Applications\Index.cshtml"
+             Link="Views\Applications\Index.cshtml"
+             CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="..\RoleValidation.Web\Views\ValidationRoles\Index.cshtml"
+             Link="Views\ValidationRoles\Index.cshtml"
+             CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="..\RoleValidation.Web\Views\RoleOwners\Index.cshtml"
+             Link="Views\RoleOwners\Index.cshtml"
+             CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="..\RoleValidation.Web\Views\SourceRoleMappings\Index.cshtml"
+             Link="Views\SourceRoleMappings\Index.cshtml"
+             CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="..\RoleValidation.Web\Views\EmailSchedules\Index.cshtml"
+             Link="Views\EmailSchedules\Index.cshtml"
+             CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="..\RoleValidation.Web\Views\EmailRuns\Index.cshtml"
+             Link="Views\EmailRuns\Index.cshtml"
+             CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="..\RoleValidation.Web\Views\DeliveryFiles\Index.cshtml"
+             Link="Views\DeliveryFiles\Index.cshtml"
+             CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="..\RoleValidation.Web\Views\Shared\_Phase2ManagementLayout.cshtml"
+             Link="Views\Shared\_Phase2ManagementLayout.cshtml"
+             CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="..\RoleValidation.Web\Views\Shared\_ManagementNavigation.cshtml"
+             Link="Views\Shared\_ManagementNavigation.cshtml"
+             CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="..\RoleValidation.Web\Views\Shared\_ManagementTopbar.cshtml"
+             Link="Views\Shared\_ManagementTopbar.cshtml"
+             CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="..\RoleValidation.Web\Views\Shared\_ApplicationUsersLocalItLayout.cshtml"
+             Link="Views\Shared\_ApplicationUsersLocalItLayout.cshtml"
+             CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="..\RoleValidation.Web\wwwroot\css\management-shell.css"
+             Link="wwwroot\css\management-shell.css"
+             CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="..\RoleValidation.Web\Views\Shared\_Layout.cshtml"
+             Link="Views\Shared\_Layout.cshtml"
+             CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="..\RoleValidation.Web\wwwroot\css\phase2-management.css"
+             Link="wwwroot\css\phase2-management.css"
+             CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="..\RoleValidation.Web\wwwroot\css\site.css"
+             Link="wwwroot\css\site.css"
+             CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="..\RoleValidation.Web\wwwroot\js\application-users.js"
+             Link="wwwroot\js\application-users.js"
+             CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="..\RoleValidation.Web\wwwroot\js\application-management.js"
+             Link="wwwroot\js\application-management.js"
+             CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="..\RoleValidation.Web\wwwroot\js\authorized-user-management.js"
+             Link="wwwroot\js\authorized-user-management.js"
+             CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="..\RoleValidation.Web\wwwroot\js\phase2-management.js"
+             Link="wwwroot\js\phase2-management.js"
+             CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="..\RoleValidation.Web\wwwroot\js\role-owner-management.js"
+             Link="wwwroot\js\role-owner-management.js"
+             CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="..\RoleValidation.Web\wwwroot\js\source-role-mapping-management.js"
+             Link="wwwroot\js\source-role-mapping-management.js"
+             CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="..\RoleValidation.Web\wwwroot\js\validation-role-management.js"
+             Link="wwwroot\js\validation-role-management.js"
+             CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="..\RoleValidation.Web\Program.cs"
+             Link="Program.cs"
+             CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="..\RoleValidation.Web\appsettings.json"
+             Link="appsettings.json"
+             CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="..\RoleValidation.Web\appsettings.Development.json"
+             Link="ConfigurationArtifacts\appsettings.Development.json"
+             CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="..\RoleValidation.Web\appsettings.QA.json"
+             Link="ConfigurationArtifacts\appsettings.QA.json"
+             CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="..\RoleValidation.Web\appsettings.Production.json"
+             Link="ConfigurationArtifacts\appsettings.Production.json"
+             CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+
+</Project>

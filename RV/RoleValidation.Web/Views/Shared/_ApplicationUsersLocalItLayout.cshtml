@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en" data-management-theme="light">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>@ViewData["Title"] · RoleValidation</title>
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/management-shell.css" asp-append-version="true" />
+</head>
+<body class="management-body application-users-management-body">
+    @await Html.PartialAsync("_ManagementNavigation")
+    <div class="management-workspace" data-management-page>
+        @await Html.PartialAsync("_ManagementTopbar")
+        <main class="application-users-management-main">
+            @RenderBody()
+        </main>
+    </div>
+    <script src="~/js/phase2-management.js" asp-append-version="true"></script>
+    <script src="~/js/application-users.js" asp-append-version="true"></script>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

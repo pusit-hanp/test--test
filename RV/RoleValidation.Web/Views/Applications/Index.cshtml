@@ -1,0 +1,259 @@
+@using RoleValidation.Application.Administration
+@using RoleValidation.Web.Models.Applications
+@model ApplicationManagementViewModel
+@{
+    Layout = "_Phase2ManagementLayout";
+    ViewData["Title"] = "Applications";
+    ViewData["ManagementPage"] = "Applications";
+    ViewData["ManagementContext"] = "All applications";
+}
+
+<section class="management-page"
+         data-management-page
+         data-focus-target="@Model.FocusTarget">
+    <header class="management-page-header" id="page-heading" tabindex="-1">
+        <div>
+            <p class="management-eyebrow">Configuration / Application register</p>
+            <h1>Applications</h1>
+            <p>
+                Maintain the registered RoleV Applications. Registration remains
+                a development and database-seed change, not an admin action.
+            </p>
+        </div>
+        <span class="management-access-note">
+            @(Model.CanManage ? "LocalItAdministration" : "AdminRead")
+        </span>
+    </header>
+
+    @if (!string.IsNullOrWhiteSpace(Model.ErrorMessage))
+    {
+        <div class="management-feedback management-feedback-error" role="alert">
+            @Model.ErrorMessage
+        </div>
+    }
+    @if (!string.IsNullOrWhiteSpace(Model.SuccessMessage))
+    {
+        <div class="management-toast"
+             role="status"
+             aria-live="polite"
+             aria-hidden="false"
+             data-management-toast>
+            @Model.SuccessMessage
+        </div>
+    }
+
+    <div class="management-summary" aria-label="Application summary">
+        <div><span>Registered</span><strong>@Model.RegisteredCount</strong></div>
+        <div><span>Active</span><strong>@Model.ActiveCount</strong></div>
+        <div><span>Inactive</span><strong>@Model.InactiveCount</strong></div>
+        <div><span>Active roles</span><strong>@Model.ActiveRoleCount</strong></div>
+        <div>
+            <span>Owner assignments</span>
+            <strong>@Model.ActiveOwnerAssignmentCount</strong>
+        </div>
+        <div>
+            <span>Source mappings</span>
+            <strong>@Model.ActiveSourceMappingCount</strong>
+        </div>
+    </div>
+
+    <section class="management-panel" aria-labelledby="application-register-title">
+        <div class="management-panel-heading">
+            <div>
+                <strong id="application-register-title">Registered applications</strong>
+                <span>
+                    IDs and internal codes are immutable. Counts come from active
+                    RoleV dependencies.
+                </span>
+            </div>
+        </div>
+        <div class="management-toolbar">
+            <label>
+                <span>Search</span>
+                <input type="search"
+                       placeholder="Name or code"
+                       data-management-search />
+            </label>
+            <label>
+                <span>Status</span>
+                <select data-management-status-filter>
+                    <option value="">All statuses</option>
+                    <option value="active">Active</option>
+                    <option value="inactive">Inactive</option>
+                </select>
+            </label>
+            <button type="button"
+                    class="management-button-secondary"
+                    data-management-clear>Clear</button>
+        </div>
+        <div class="management-table-wrap">
+            <table class="management-table">
+                <thead>
+                    <tr>
+                        <th>Application</th>
+                        <th>Internal code</th>
+                        <th>Status</th>
+                        <th>Active roles</th>
+                        <th>Owner assignments</th>
+                        <th>Source mappings</th>
+                        @if (Model.CanManage)
+                        {
+                            <th>Action</th>
+                        }
+                    </tr>
+                </thead>
+                <tbody data-management-rows>
+                    @foreach (ApplicationAdministrationRow application in
+                        Model.Applications)
+                    {
+                        string status = application.IsActive ? "active" : "inactive";
+                        <tr id="application-@application.ApplicationId"
+                            tabindex="-1"
+                            data-management-row
+                            data-status="@status"
+                            data-search="@application.ApplicationName @application.ApplicationCode">
+                            <td>
+                                <span class="management-primary-cell">
+                                    <strong>@application.ApplicationName</strong>
+                                    <span class="management-mono">
+                                        APPLICATION_ID @application.ApplicationId
+                                    </span>
+                                </span>
+                            </td>
+                            <td class="management-mono">@application.ApplicationCode</td>
+                            <td>
+                                <span class="management-chip management-chip-@status">
+                                    @(application.IsActive ? "Active" : "Inactive")
+                                </span>
+                            </td>
+                            <td>@application.DependencyCounts.ActiveRoles</td>
+                            <td>@application.DependencyCounts.ActiveOwnerAssignments</td>
+                            <td>@application.DependencyCounts.ActiveSourceMappings</td>
+                            @if (Model.CanManage)
+                            {
+                                <td>
+                                    <a class="management-row-action"
+                                       href="#application-editor-@application.ApplicationId"
+                                       data-drawer-trigger>
+                                        Manage
+                                    </a>
+                                </td>
+                            }
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+        <p class="management-filter-empty" role="status" hidden
+           data-management-empty>
+            No Applications match the current filters.
+        </p>
+    </section>
+
+    @if (Model.CanManage)
+    {
+        @foreach (ApplicationAdministrationRow application in Model.Applications)
+        {
+            string dependencyDescriptionId =
+                $"application-dependencies-{application.ApplicationId}";
+            string editorName = Model.EditorApplicationId == application.ApplicationId
+                ? Model.EditorApplicationName ?? application.ApplicationName
+                : application.ApplicationName;
+            <section class="management-drawer"
+                     id="application-editor-@application.ApplicationId"
+                     aria-labelledby="application-editor-title-@application.ApplicationId"
+                     data-management-drawer>
+                <header>
+                    <div>
+                        <strong id="application-editor-title-@application.ApplicationId">
+                            Manage @application.ApplicationName
+                        </strong>
+                        <span>Application identity remains immutable.</span>
+                    </div>
+                    <a href="#application-@application.ApplicationId"
+                       aria-label="Close Application editor"
+                       data-drawer-close>Close</a>
+                </header>
+                <div class="management-drawer-body">
+                    <div class="management-form-grid">
+                        <label>
+                            <span>Application ID</span>
+                            <input value="@application.ApplicationId" readonly />
+                        </label>
+                        <label>
+                            <span>Internal code</span>
+                            <input class="management-mono"
+                                   value="@application.ApplicationCode"
+                                   readonly />
+                        </label>
+                    </div>
+
+                    <form asp-action="Rename" method="post" class="management-stack">
+                        @Html.AntiForgeryToken()
+                        <input type="hidden"
+                               name="applicationId"
+                               value="@application.ApplicationId" />
+                        <label>
+                            <span>Display name</span>
+                            <input name="applicationName"
+                                   value="@editorName"
+                                   maxlength="200"
+                                   data-trim-required
+                                   required />
+                        </label>
+                        <button type="submit">Save display name</button>
+                    </form>
+
+                    <div class="management-divider"></div>
+                    <div class="management-lifecycle">
+                        <div>
+                            <strong>Lifecycle</strong>
+                            @if (application.IsActive)
+                            {
+                                <span id="@dependencyDescriptionId">
+                                    @if (application.DependencyCounts.CanDeactivate)
+                                    {
+                                        <text>No active dependencies block deactivation.</text>
+                                    }
+                                    else
+                                    {
+                                        <text>
+                                            Deactivation is blocked by
+                                            @application.DependencyCounts.ActiveRoles active Roles,
+                                            @application.DependencyCounts.ActiveOwnerAssignments Owner assignments,
+                                            and @application.DependencyCounts.ActiveSourceMappings Source Mappings.
+                                        </text>
+                                    }
+                                </span>
+                            }
+                            else
+                            {
+                                <span>Activation makes this Application available again.</span>
+                            }
+                        </div>
+                        <form asp-action="SetActive" method="post">
+                            @Html.AntiForgeryToken()
+                            <input type="hidden"
+                                   name="applicationId"
+                                   value="@application.ApplicationId" />
+                            <input type="hidden"
+                                   name="isActive"
+                                   value="@(application.IsActive ? "false" : "true")" />
+                            <button type="submit"
+                                    class="@(application.IsActive ? "management-button-danger" : null)"
+                                    disabled="@(application.IsActive && !application.DependencyCounts.CanDeactivate)"
+                                    aria-describedby="@(application.IsActive ? dependencyDescriptionId : null)"
+                                    data-confirm-message="@(application.IsActive ? "Deactivate this Application?" : null)">
+                                @(application.IsActive ? "Deactivate" : "Activate")
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </section>
+        }
+    }
+</section>
+
+@section Scripts {
+    <script src="~/js/application-management.js" asp-append-version="true"></script>
+}

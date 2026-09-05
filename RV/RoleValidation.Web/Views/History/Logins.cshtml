@@ -1,0 +1,304 @@
+@using RoleValidation.Application.History
+@using RoleValidation.Web.Models.History
+@model LoginHistoryViewModel
+@{
+    Layout = "_Phase2ManagementLayout";
+    ViewData["Title"] = "Login history";
+    ViewData["ManagementPage"] = "Login history";
+    ViewData["ManagementContext"] = "Append-only evidence";
+    int visiblePageCount = Math.Min(5, Model.TotalPages);
+    int firstVisiblePage = Math.Max(1, Model.PageNumber - 2);
+    int lastVisiblePage = Math.Min(
+        Model.TotalPages,
+        firstVisiblePage + visiblePageCount - 1);
+    firstVisiblePage = Math.Max(
+        1,
+        lastVisiblePage - visiblePageCount + 1);
+    int firstVisibleRow = Model.TotalCount == 0
+        ? 0
+        : ((Model.PageNumber - 1) * Model.PageSize) + 1;
+    int lastVisibleRow = Math.Min(
+        Model.PageNumber * Model.PageSize,
+        Model.TotalCount);
+}
+
+<section class="management-page" data-management-page>
+    <header class="management-page-header">
+        <div>
+            <span class="management-eyebrow">History / Access decisions</span>
+            <h1 id="page-heading" tabindex="-1">Login history</h1>
+            <p>
+                Review recent login events and filter by result, employee number,
+                or correlation trace.
+            </p>
+        </div>
+    </header>
+
+    <div class="management-callout management-callout-teal">
+        <div>
+            <strong>Read only</strong>
+            <span>
+                Login events are immutable. Correlation ID is used for
+                tracing only.
+            </span>
+        </div>
+    </div>
+
+    <section class="management-panel" aria-labelledby="login-events-title">
+        <div class="management-panel-heading">
+            <div>
+                <strong id="login-events-title">Search login events</strong>
+                <span>
+                    Employee number and Correlation ID are optional exact filters.
+                    50 events per page, newest first.
+                </span>
+            </div>
+        </div>
+        <form method="get"
+              asp-action="Logins"
+              class="management-toolbar management-history-login-toolbar">
+            <input type="hidden" name="search" value="true" />
+            <label>
+                <span>Employee number</span>
+                <input type="search"
+                       name="employeeNo"
+                       value="@Model.EmployeeNo"
+                       maxlength="8"
+                       placeholder="C1008267" />
+            </label>
+            <label>
+                <span>Correlation ID</span>
+                <input class="management-mono"
+                       type="search"
+                       name="correlationId"
+                       value="@Model.CorrelationId"
+                       maxlength="64"
+                       placeholder="trace identifier" />
+            </label>
+            <label>
+                <span>Result</span>
+                <select name="result">
+                    <option value="">All results</option>
+                    <option value="SUCCESS"
+                            selected="@(Model.Result == "SUCCESS")">SUCCESS</option>
+                    <option value="DENIED"
+                            selected="@(Model.Result == "DENIED")">DENIED</option>
+                </select>
+            </label>
+            <button type="submit">Search</button>
+            <a class="management-button-secondary"
+               asp-action="Logins">Clear</a>
+        </form>
+
+        @if (Model.ErrorCode is not null)
+        {
+            <div class="management-feedback management-feedback-error"
+                 role="alert">
+                @(Model.ErrorCode switch
+                {
+                    "LOGIN_EMPLOYEE_NO_TOO_LONG" => "Employee number must be 8 characters or fewer.",
+                    "LOGIN_CORRELATION_ID_TOO_LONG" => "Correlation ID must be 64 characters or fewer.",
+                    "LOGIN_RESULT_INVALID" => "Choose All results, SUCCESS, or DENIED.",
+                    _ => "The login history filters are invalid."
+                })
+            </div>
+        }
+        else if (Model.Rows.Count == 0)
+        {
+            <div class="management-empty-state" role="status">
+                <strong>No login events found</strong>
+                <span>Try another result or clear the filters.</span>
+            </div>
+        }
+        else
+        {
+            <div class="management-table-wrap">
+                <table class="management-table management-history-table">
+                    <thead>
+                        <tr>
+                            <th>Login date</th>
+                            <th>Employee number</th>
+                            <th>Result</th>
+                            <th>Failure reason</th>
+                            <th>Correlation ID</th>
+                            <th>Detail</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (LoginHistoryRow row in Model.Rows)
+                        {
+                            string resultClass = row.Result == "SUCCESS"
+                                ? "active"
+                                : "inactive";
+                            <tr>
+                                <td>
+                                    <time class="management-history-time"
+                                          datetime="@row.LoginDate.ToString("O")">
+                                        @HistoryViewFormatting.FormatBangkok(row.LoginDate)
+                                    </time>
+                                </td>
+                                <td class="management-mono">
+                                    @(row.EmployeeNo ?? "Not resolved")
+                                </td>
+                                <td>
+                                    <span class="management-chip management-chip-@resultClass">
+                                        @row.Result
+                                    </span>
+                                </td>
+                                <td class="management-mono">
+                                    @(row.FailureReason ?? "None")
+                                </td>
+                                <td class="management-mono">@row.CorrelationId</td>
+                                <td>
+                                    <a id="login-history-action-@row.LoginHistoryId"
+                                       class="management-row-action"
+                                       href="#login-history-detail-@row.LoginHistoryId"
+                                       data-drawer-trigger>Open</a>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="management-history-footer">
+                <span>
+                    Showing @firstVisibleRow-@lastVisibleRow of
+                    @Model.TotalCount event@(Model.TotalCount == 1 ? "" : "s") ·
+                    newest first
+                </span>
+                <nav class="management-history-pager"
+                     aria-label="Login history pages">
+                    @if (Model.PageNumber > 1)
+                    {
+                        <a class="management-button-secondary"
+                           asp-action="Logins"
+                           asp-route-search="true"
+                           asp-route-employeeNo="@Model.EmployeeNo"
+                           asp-route-correlationId="@Model.CorrelationId"
+                           asp-route-result="@Model.Result"
+                           asp-route-page="1">First</a>
+                        <a class="management-button-secondary"
+                           asp-action="Logins"
+                           asp-route-search="true"
+                           asp-route-employeeNo="@Model.EmployeeNo"
+                           asp-route-correlationId="@Model.CorrelationId"
+                           asp-route-result="@Model.Result"
+                           asp-route-page="@(Model.PageNumber - 1)">Previous</a>
+                    }
+                    else
+                    {
+                        <span class="management-button-secondary"
+                              aria-disabled="true">First</span>
+                        <span class="management-button-secondary"
+                              aria-disabled="true">Previous</span>
+                    }
+
+                    @for (int pageNumber = firstVisiblePage;
+                          pageNumber <= lastVisiblePage;
+                          pageNumber++)
+                    {
+                        if (pageNumber == Model.PageNumber)
+                        {
+                            <span class="management-button-secondary management-pager-page"
+                                  aria-current="page">@pageNumber</span>
+                        }
+                        else
+                        {
+                            <a class="management-button-secondary management-pager-page"
+                               asp-action="Logins"
+                               asp-route-search="true"
+                               asp-route-employeeNo="@Model.EmployeeNo"
+                               asp-route-correlationId="@Model.CorrelationId"
+                               asp-route-result="@Model.Result"
+                               asp-route-page="@pageNumber"
+                               aria-label="Page @pageNumber">@pageNumber</a>
+                        }
+                    }
+
+                    @if (Model.PageNumber < Model.TotalPages)
+                    {
+                        <a class="management-button-secondary"
+                           asp-action="Logins"
+                           asp-route-search="true"
+                           asp-route-employeeNo="@Model.EmployeeNo"
+                           asp-route-correlationId="@Model.CorrelationId"
+                           asp-route-result="@Model.Result"
+                           asp-route-page="@(Model.PageNumber + 1)">Next</a>
+                        <a class="management-button-secondary"
+                           asp-action="Logins"
+                           asp-route-search="true"
+                           asp-route-employeeNo="@Model.EmployeeNo"
+                           asp-route-correlationId="@Model.CorrelationId"
+                           asp-route-result="@Model.Result"
+                           asp-route-page="@Model.TotalPages">Last</a>
+                    }
+                    else
+                    {
+                        <span class="management-button-secondary"
+                              aria-disabled="true">Next</span>
+                        <span class="management-button-secondary"
+                              aria-disabled="true">Last</span>
+                    }
+                </nav>
+            </div>
+        }
+    </section>
+
+    @foreach (LoginHistoryRow row in Model.Rows)
+    {
+        <section class="management-drawer"
+                 id="login-history-detail-@row.LoginHistoryId"
+                 tabindex="-1"
+                 aria-labelledby="login-history-title-@row.LoginHistoryId"
+                 data-management-drawer>
+            <header>
+                <div>
+                    <strong id="login-history-title-@row.LoginHistoryId">
+                        Login event detail
+                    </strong>
+                    <span>@row.CorrelationId</span>
+                </div>
+                <a href="#login-history-action-@row.LoginHistoryId"
+                   aria-label="Close login event detail"
+                   data-drawer-close>Close</a>
+            </header>
+            <div class="management-drawer-body">
+                <div class="management-callout management-callout-teal">
+                    <div>
+                        <strong>Tracing only</strong>
+                        <span>
+                            Correlation ID never establishes identity or
+                            authorization.
+                        </span>
+                    </div>
+                </div>
+                <dl class="management-key-value">
+                    <div>
+                        <dt>Login date</dt>
+                        <dd>@HistoryViewFormatting.FormatBangkok(row.LoginDate)</dd>
+                    </div>
+                    <div>
+                        <dt>Employee number</dt>
+                        <dd class="management-mono">
+                            @(row.EmployeeNo ?? "Not resolved")
+                        </dd>
+                    </div>
+                    <div><dt>Result</dt><dd>@row.Result</dd></div>
+                    <div>
+                        <dt>Failure reason</dt>
+                        <dd class="management-mono">
+                            @(row.FailureReason ?? "None")
+                        </dd>
+                    </div>
+                    <div>
+                        <dt>Correlation ID</dt>
+                        <dd class="management-mono management-history-payload">
+                            @row.CorrelationId
+                        </dd>
+                    </div>
+                </dl>
+            </div>
+        </section>
+    }
+</section>

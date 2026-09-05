@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en" data-management-theme="light">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>@ViewData["Title"] · RoleValidation</title>
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/management-shell.css" asp-append-version="true" />
+</head>
+<body class="application-users-review-body" data-management-page>
+    <header class="app-header">
+        <a class="brand" asp-controller="ApplicationUsers" asp-action="Index">
+            <span class="brand-mark" aria-hidden="true">RV</span>
+            <span>
+                <strong>RoleValidation</strong>
+                <small>Access review workspace</small>
+            </span>
+        </a>
+        <div class="app-header-actions">
+            <span class="environment">@Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT")</span>
+            <div class="management-theme-switch" aria-label="Appearance">
+                <button type="button" data-theme-choice="light" aria-pressed="true">Light</button>
+                <button type="button" data-theme-choice="dark" aria-pressed="false">Dark</button>
+                <button type="button" data-theme-choice="system" aria-pressed="false">System</button>
+            </div>
+            @if (User.IsInRole("Local_IT_Admin"))
+            {
+                <a class="button-secondary app-header-management-link"
+                   asp-controller="Applications"
+                   asp-action="Index">Management</a>
+            }
+            @if (User.Identity?.IsAuthenticated == true)
+            {
+                <span class="current-user">
+                    Signed in as <strong>@User.Identity?.Name</strong>
+                </span>
+                <form class="logout-form"
+                      asp-controller="Authentication"
+                      asp-action="Logout"
+                      method="post">
+                    @Html.AntiForgeryToken()
+                    <button type="submit" class="button-secondary">
+                        Sign out
+                    </button>
+                </form>
+            }
+        </div>
+    </header>
+    <main>
+        @RenderBody()
+    </main>
+    <script src="~/js/phase2-management.js" asp-append-version="true"></script>
+    <script src="~/js/application-users.js" asp-append-version="true"></script>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

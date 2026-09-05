@@ -1,0 +1,99 @@
+@{
+    string pageName = ViewData["ManagementPage"] as string ?? "Configuration";
+}
+<details class="management-navigation" open data-management-navigation>
+    <summary aria-label="Toggle RoleV navigation">
+        <span class="management-brand-mark" aria-hidden="true">RV</span>
+        <span>RoleV navigation</span>
+    </summary>
+    <div class="management-navigation-inner">
+        <a class="management-brand"
+           asp-controller="Applications"
+           asp-action="Index">
+            <span class="management-brand-mark" aria-hidden="true">RV</span>
+            <span>
+                <strong>RoleV</strong>
+                <small>Role Validation workspace</small>
+            </span>
+        </a>
+        <nav aria-label="Primary">
+            <section aria-labelledby="management-review-nav">
+                <p id="management-review-nav" class="management-nav-label">
+                    Review
+                </p>
+                <a asp-controller="ApplicationUsers" asp-action="Index"
+                   aria-current="@(pageName == "Application users" ? "page" : null)">
+                    Application users
+                </a>
+                <a asp-controller="DeliveryFiles"
+                   asp-action="Index"
+                   aria-current="@(pageName == "Delivery files" ? "page" : null)">
+                    Delivery files
+                </a>
+            </section>
+            <section aria-labelledby="management-config-nav">
+                <p id="management-config-nav" class="management-nav-label">
+                    Configuration
+                </p>
+                <a asp-controller="Applications"
+                   asp-action="Index"
+                   aria-current="@(pageName == "Applications" ? "page" : null)">
+                    Applications
+                </a>
+                <a asp-controller="ValidationRoles"
+                   asp-action="Index"
+                   aria-current="@(pageName == "Validation roles" ? "page" : null)">
+                    Validation roles
+                </a>
+                <a asp-controller="RoleOwners"
+                   asp-action="Index"
+                   aria-current="@(pageName == "Role owners" ? "page" : null)">
+                    Role owners
+                </a>
+                <a asp-controller="SourceRoleMappings"
+                   asp-action="Index"
+                   aria-current="@(pageName == "Source mappings" ? "page" : null)">
+                    Source mappings
+                </a>
+                @if (User.IsInRole("Local_IT_Admin"))
+                {
+                    <a asp-controller="AuthorizedUsers"
+                       asp-action="Index"
+                       aria-current="@(pageName == "Authorized users" ? "page" : null)">
+                        Authorized users
+                    </a>
+                }
+            </section>
+            <section aria-labelledby="management-operations-nav">
+                <p id="management-operations-nav"
+                   class="management-nav-label">Operations</p>
+                @if (User.IsInRole("Local_IT_Admin"))
+                {
+                    <a asp-controller="EmailSchedules"
+                       asp-action="Index"
+                       aria-current="@(pageName == "Annual delivery" || pageName == "Run detail" ? "page" : null)">
+                        Annual delivery
+                    </a>
+                }
+            </section>
+            <section aria-labelledby="management-history-nav">
+                <p id="management-history-nav" class="management-nav-label">
+                    History
+                </p>
+                @if (User.IsInRole("Local_IT_Admin"))
+                {
+                    <a asp-controller="History"
+                       asp-action="Changes"
+                       aria-current="@(pageName == "Change history" ? "page" : null)">
+                        Change history
+                    </a>
+                    <a asp-controller="History"
+                       asp-action="Logins"
+                       aria-current="@(pageName == "Login history" ? "page" : null)">
+                        Login history
+                    </a>
+                }
+            </section>
+        </nav>
+    </div>
+</details>

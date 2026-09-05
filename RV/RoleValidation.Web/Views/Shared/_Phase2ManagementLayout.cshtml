@@ -1,0 +1,48 @@
+@using RoleValidation.Web.Authentication
+@{
+    string contextName = ViewData["ManagementContext"] as string
+        ?? "All applications";
+}
+<!DOCTYPE html>
+<html lang="en" data-management-theme="light">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>@ViewData["Title"] · RoleValidation</title>
+    <link rel="stylesheet" href="~/css/management-shell.css" asp-append-version="true" />
+    <link rel="stylesheet"
+          href="~/css/phase2-management.css"
+          asp-append-version="true" />
+</head>
+<body class="management-body">
+    @await Html.PartialAsync("_ManagementNavigation")
+
+    <div class="management-workspace">
+        @await Html.PartialAsync("_ManagementTopbar")
+
+        <section class="management-contextbar"
+                 aria-label="Application and data boundary">
+            <div class="management-context">
+                <span>Application context</span>
+                <strong>@contextName</strong>
+            </div>
+            <div class="management-boundary">
+                <div class="management-boundary-write">
+                    <span>RoleV configuration</span>
+                    <strong>Managed in RoleV</strong>
+                </div>
+                <div class="management-boundary-read">
+                    <span>Legacy source</span>
+                    <strong>Read only · no permission write-back</strong>
+                </div>
+            </div>
+        </section>
+
+        <main class="management-main">
+            @RenderBody()
+        </main>
+    </div>
+    <script src="~/js/phase2-management.js" asp-append-version="true"></script>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

@@ -1,0 +1,38 @@
+@{
+    string pageName = ViewData["ManagementPage"] as string ?? "Configuration";
+    string permission = User.IsInRole("Local_IT_Admin") ? "Local_IT_Admin" : "Admin";
+}
+<header class="management-topbar">
+    <nav aria-label="Breadcrumb" class="management-breadcrumb">
+        <span>Role Validation</span>
+        <span aria-hidden="true">/</span>
+        <strong>@pageName</strong>
+    </nav>
+    <div class="management-topbar-spacer"></div>
+    <div class="management-theme-switch" aria-label="Appearance">
+        <button type="button"
+                data-theme-choice="light"
+                aria-pressed="true">Light</button>
+        <button type="button"
+                data-theme-choice="dark"
+                aria-pressed="false">Dark</button>
+        <button type="button"
+                data-theme-choice="system"
+                aria-pressed="false">System</button>
+    </div>
+    <span class="management-permission">
+        Current permission <strong>@permission</strong>
+    </span>
+    <span class="management-current-user">
+        Signed in as <strong>@User.Identity?.Name</strong>
+    </span>
+    <form class="management-logout-form"
+          asp-controller="Authentication"
+          asp-action="Logout"
+          method="post">
+        @Html.AntiForgeryToken()
+        <button type="submit" class="management-button-secondary">
+            Sign out
+        </button>
+    </form>
+</header>

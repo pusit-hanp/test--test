@@ -1,0 +1,38 @@
+@model IReadOnlyList<string>
+@{
+    Layout = "_Phase2ManagementLayout";
+    ViewData["Title"] = "Email configuration unavailable";
+    ViewData["ManagementPage"] = "Annual delivery";
+    ViewData["ManagementContext"] = "Email unavailable";
+}
+
+<section class="management-page">
+    <header class="management-page-header">
+        <div>
+            <p class="management-eyebrow">Operations / Email</p>
+            <h1>Email configuration unavailable</h1>
+        </div>
+    </header>
+    <div class="management-feedback management-feedback-error" role="alert">
+        <p>Email configuration is missing or invalid. Email processing is disabled.
+            Other parts of RoleValidation remain available.</p>
+        <p class="management-mono">EMAIL_CONFIGURATION_INVALID</p>
+        @if (Model.Count > 0)
+        {
+            <p>Review these configuration keys:</p>
+            <ul>
+                @foreach (string key in Model)
+                {
+                    <li class="management-mono">@key</li>
+                }
+            </ul>
+            <p>Correct the environment configuration and restart the application
+                before using email operations.</p>
+        }
+        else
+        {
+            <p>Contact a Local IT Admin to review the email configuration.</p>
+        }
+    </div>
+    <a asp-controller="ApplicationUsers" asp-action="Index">Back to application users</a>
+</section>
